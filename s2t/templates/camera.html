@@ -1,17 +1,41 @@
-<!-- templates/camera.html -->
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Capture Gesture</title>
+  <title>Sign Language Gesture Capture</title>
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    #video {
+      border: 1px solid #ccc;
+    }
+
+    button {
+      margin-top: 10px;
+      padding: 10px;
+      font-size: 16px;
+    }
+
+    #result,
+    #keyword,
+    #recommendation {
+      margin-top: 20px;
+    }
+  </style>
 </head>
 
 <body>
-  <h1>Capture Your Gesture</h1>
-  <video id="video" width="640" height="480" autoplay></video>
+  <h1>Sign Language Gesture Capture</h1>
+  <video id="video" width="640" height="480" autoplay playsinline></video>
+  <br>
   <button id="capture">Capture Gesture</button>
   <canvas id="canvas" width="640" height="480" style="display: none;"></canvas>
   <p id="result"></p>
@@ -29,19 +53,28 @@
     const getRecommendationButton = document.getElementById('getRecommendation');
     const recommendationParagraph = document.getElementById('recommendation');
 
-    navigator.mediaDevices.getUserMedia({
-        video: true
-      })
-      .then(stream => {
+    // Initialize the camera
+    async function initCamera() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: true
+        });
         video.srcObject = stream;
-      })
-      .catch(err => console.error(err));
+      } catch (err) {
+        console.error('Error accessing the camera:', err);
+        alert('Unable to access the camera. Please make sure it\'s connected and you\'ve granted permission.');
+      }
+    }
 
+    initCamera();
+
+    // Capture and process the gesture
     captureButton.addEventListener('click', () => {
       canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
       canvas.toBlob(blob => {
         const formData = new FormData();
         formData.append('image', blob, 'capture.jpg');
+
         axios.post('/process_frame', formData)
           .then(response => {
             if (response.data.recognized_char) {
@@ -51,12 +84,17 @@
               getRecommendationButton.style.display = 'block';
             } else {
               console.error('Error:', response.data.error);
+              alert('No gesture recognized. Please try again.');
             }
           })
-          .catch(error => console.error('Error:', error));
+          .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while processing the gesture. Please try again.');
+          });
       });
     });
 
+    // Get recommendation based on the recognized keyword
     getRecommendationButton.addEventListener('click', () => {
       axios.post('/get_recommendation', {
           keyword: recognizedChars
@@ -64,7 +102,10 @@
         .then(response => {
           recommendationParagraph.textContent = response.data.recommendation;
         })
-        .catch(error => console.error('Error:', error));
+        .catch(error => {
+          console.error('Error:', error);
+          alert('An error occurred while getting the recommendation. Please try again.');
+        });
     });
   </script>
 </body>
