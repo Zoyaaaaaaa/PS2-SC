@@ -7,49 +7,248 @@
   <title>Text to Sign Language Converter</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      max-width: 800px;
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #ffffff;
+      color: #333333;
+    }
+
+    .nav-bar {
+      background-color: #ffffff;
+      padding: 20px 0;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .nav-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+    }
+
+    .logo {
+      font-size: 24px;
+      font-weight: bold;
+      color: #4FD1C5;
+    }
+
+    .nav-links {
+      display: none;
+    }
+
+    .nav-links a {
+      color: #333333;
+      text-decoration: none;
+      margin-left: 20px;
+      font-weight: 500;
+    }
+
+    .container {
+      max-width: 1200px;
       margin: 0 auto;
       padding: 20px;
     }
 
-    form {
+    .hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .hero-content {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      font-size: 36px;
+      color: #333333;
+      margin-bottom: 20px;
+    }
+
+    h1 span {
+      color: #4FD1C5;
+    }
+
+    p {
+      font-size: 18px;
+      color: #666666;
+      margin-bottom: 30px;
+    }
+
+    .hero-image {
+      width: 100%;
+      max-width: 300px;
+      margin-bottom: 20px;
+    }
+
+    .hero-image img {
+      width: 100%;
+      height: auto;
+      border-radius: 8px;
+    }
+
+    .converter-container {
+      background-color: #f8f9fa;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .input-section {
       margin-bottom: 20px;
     }
 
     input[type="text"] {
       width: 100%;
-      padding: 10px;
-      margin-bottom: 10px;
+      padding: 12px;
+      margin-bottom: 15px;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      font-size: 16px;
     }
 
-    input[type="submit"] {
-      padding: 10px 20px;
-      background-color: #4CAF50;
-      color: white;
+    .button-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      flex: 1;
+      padding: 12px 24px;
       border: none;
+      border-radius: 6px;
       cursor: pointer;
+      font-size: 16px;
+      font-weight: 500;
+      transition: background-color 0.3s;
     }
 
-    #result,
-    #error {
-      margin-top: 20px;
+    .convert-btn {
+      background-color: #4FD1C5;
+      color: #ffffff;
+    }
+
+    .clear-btn {
+      background-color: #f8f9fa;
+      color: #333333;
+      border: 1px solid #e0e0e0;
+    }
+
+    .result-section {
+      margin-top: 30px;
+    }
+
+    .result-container {
+      width: 100%;
+      min-height: 200px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #ffffff;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      overflow-x: auto;
+    }
+
+    .result-container img {
+      max-width: none;
+      height: 150px;
+      object-fit: contain;
     }
 
     #error {
-      color: red;
+      color: #dc3545;
+      margin-top: 15px;
+      padding: 10px;
+      border-radius: 6px;
+      background-color: #f8d7da;
+    }
+
+    @media (min-width: 768px) {
+      .nav-links {
+        display: block;
+      }
+
+      .hero {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .hero-content {
+        text-align: left;
+        flex: 1;
+        padding-right: 40px;
+      }
+
+      h1 {
+        font-size: 48px;
+      }
+
+      .hero-image {
+        flex: 1;
+        max-width: none;
+      }
+
+      .converter-container {
+        padding: 30px;
+      }
+
+      .button-group {
+        flex-wrap: nowrap;
+      }
     }
   </style>
 </head>
 
 <body>
-  <h1>Text to Sign Language Converter</h1>
-  <form method="post" id="converter-form">
-    <input type="text" name="text" placeholder="Enter text to convert" required>
-    <input type="submit" value="Convert">
-  </form>
-  <div id="result"></div>
-  <div id="error"></div>
+  <nav class="nav-bar">
+    <div class="nav-content">
+      <div class="logo">TravelEase</div>
+      <div class="nav-links">
+        <a href="#">Home</a>
+        <a href="#">About</a>
+        <a href="#">Learn More</a>
+        <a href="#">Pricing</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="hero">
+      <div class="hero-content">
+        <h1>Explore <span>Accessible</span><br>Communication for All</h1>
+        <p>Convert text to sign language and break down communication barriers. Discover a world of inclusive interaction.</p>
+      </div>
+      <div class="hero-image">
+        <img src="https://png.pngtree.com/png-clipart/20220926/ourmid/pngtree-international-day-of-the-deaf-for-persons-with-disabilities-png-image_6145614.png" alt="Sign Language">
+      </div>
+    </div>
+
+    <div class="converter-container">
+      <div class="input-section">
+        <form id="converter-form">
+          <input type="text" name="text" placeholder="Enter text to convert to sign language" required>
+          <div class="button-group">
+            <button type="submit" class="convert-btn">Convert</button>
+            <button type="button" class="clear-btn" id="clear-btn">Clear</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="result-section">
+        <div class="result-container" id="result">
+          <!-- Placeholder for the image -->
+        </div>
+      </div>
+    </div>
+  </div>
 
   <script>
     document.getElementById('converter-form').addEventListener('submit', function(e) {
@@ -73,13 +272,21 @@
           const result = document.getElementById('result');
           result.innerHTML = '';
           result.appendChild(img);
-          document.getElementById('error').innerHTML = '';
         })
         .catch(error => {
           console.error('Error:', error);
-          document.getElementById('error').innerHTML = `Error: ${error.error}<br>Traceback: <pre>${error.traceback}</pre>`;
-          document.getElementById('result').innerHTML = '';
+          const result = document.getElementById('result');
+          result.innerHTML = `< div id = "error" > Error: $ {
+            error.error
+          } < br > Traceback: < pre > $ {
+            error.traceback
+          } < /pre></div >`;
         });
+    });
+
+    document.getElementById('clear-btn').addEventListener('click', function() {
+      document.querySelector('input[name="text"]').value = '';
+      document.getElementById('result').innerHTML = '';
     });
   </script>
 </body>

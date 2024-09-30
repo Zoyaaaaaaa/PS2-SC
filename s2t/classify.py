@@ -1,33 +1,32 @@
 import pickle
 import numpy as np
-from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import classification_report, accuracy_score
 
-# Load the data
-data_set = pickle.load(open('./data.pickle', 'rb'))
+# Load the normalized data
+with open('data_normalized.pickle', 'rb') as f:
+    data_dict = pickle.load(f)
 
-# Check if all data entries have consistent shape
-data = data_set['data']
-max_length = max([len(item) for item in data])
-
-# Ensure all entries have the same length by padding
-data = [item + [0] * (max_length - len(item)) if len(item) < max_length else item[:max_length] for item in data]
-
-# Convert the data and labels to numpy arrays
-data = np.asarray(data)
-label = np.asarray(data_set['label'])
+data = data_dict['data']
+labels = data_dict['labels']
 
 # Split the dataset
-x_train, x_test, y_train, y_test = train_test_split(data, label, test_size=0.2, shuffle=True)
+X_train, X_test, y_train, y_test = train_test_split(data, labels, test_size=0.2, random_state=42)
 
 # Train the RandomForestClassifier model
-model = RandomForestClassifier()
-model.fit(x_train, y_train)
+model = RandomForestClassifier(n_estimators=100, random_state=42)
+model.fit(X_train, y_train)
 
-# Predict using the test set
-predict = model.predict(x_test)
-print(predict)
+# Evaluate the model
+y_pred = model.predict(X_test)
+accuracy = accuracy_score(y_test, y_pred)
+print(f"Model Accuracy: {accuracy:.2f}")
+print("\nClassification Report:")
+print(classification_report(y_test, y_pred))
 
-# Save the trained model using pickle
-with open('model.p', 'wb') as f:
-    pickle.dump({'model': model}, f)
+# Save the trained model
+with open('model.pickle', 'wb') as f:
+    pickle.dump({'model': model, 'mean': data_dict['mean'], 'std': data_dict['std']}, f)
+
+print("Model saved successfully.")

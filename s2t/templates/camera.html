@@ -4,108 +4,79 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sign Language Gesture Capture</title>
+  <title>Sign Language Recognition</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-
-    #video {
-      border: 1px solid #ccc;
-    }
-
-    button {
-      margin-top: 10px;
-      padding: 10px;
-      font-size: 16px;
-    }
-
-    #result,
-    #keyword,
-    #recommendation {
-      margin-top: 20px;
-    }
-  </style>
 </head>
 
-<body>
-  <h1>Sign Language Gesture Capture</h1>
-  <video id="video" width="640" height="480" autoplay playsinline></video>
-  <br>
-  <button id="capture">Capture Gesture</button>
-  <canvas id="canvas" width="640" height="480" style="display: none;"></canvas>
-  <p id="result"></p>
-  <p id="keyword"></p>
-  <button id="getRecommendation" style="display: none;">Get Recommendation</button>
-  <p id="recommendation"></p>
-
+<body class="bg-gray-100">
+  <div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-6">Sign Language Recognition</h1>
+    <div class="flex flex-col md:flex-row">
+      <div class="w-full md:w-1/2 mb-4 md:mb-0 md:mr-4">
+        <img id="video_feed" src="{{ url_for('video_feed') }}" alt="Video feed" class="w-full h-auto">
+      </div>
+      <div class="w-full md:w-1/2">
+        <div class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+          <div class="mb-4">
+            <label class="block text-gray-700 text-sm font-bold mb-2" for="keyword">
+              Enter keyword to match:
+            </label>
+            <input type="text" id="keyword" name="keyword" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+          </div>
+          <div class="mb-4">
+            <button id="captureBtn" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+              Capture Sign
+            </button>
+          </div>
+          <div id="result" class="mt-4"></div>
+        </div>
+      </div>
+    </div>
+  </div>
   <script>
-    let recognizedChars = '';
-    const video = document.getElementById('video');
-    const canvas = document.getElementById('canvas');
-    const captureButton = document.getElementById('capture');
-    const resultParagraph = document.getElementById('result');
-    const keywordParagraph = document.getElementById('keyword');
-    const getRecommendationButton = document.getElementById('getRecommendation');
-    const recommendationParagraph = document.getElementById('recommendation');
+    const captureBtn = document.getElementById('captureBtn');
+    const resultDiv = document.getElementById('result');
+    const keywordInput = document.getElementById('keyword');
+    const videoFeed = document.getElementById('video_feed');
 
-    // Initialize the camera
-    async function initCamera() {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: true
-        });
-        video.srcObject = stream;
-      } catch (err) {
-        console.error('Error accessing the camera:', err);
-        alert('Unable to access the camera. Please make sure it\'s connected and you\'ve granted permission.');
+    captureBtn.addEventListener('click', async () => {
+      const keyword = keywordInput.value.trim();
+      if (!keyword) {
+        alert('Please enter a keyword');
+        return;
       }
-    }
 
-    initCamera();
+      const canvas = document.createElement('canvas');
+      canvas.width = videoFeed.width;
+      canvas.height = videoFeed.height;
+      canvas.getContext('2d').drawImage(videoFeed, 0, 0, canvas.width, canvas.height);
+      const imageDataUrl = canvas.toDataURL('image/jpeg');
 
-    // Capture and process the gesture
-    captureButton.addEventListener('click', () => {
-      canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
-      canvas.toBlob(blob => {
-        const formData = new FormData();
-        formData.append('image', blob, 'capture.jpg');
-
-        axios.post('/process_frame', formData)
-          .then(response => {
-            if (response.data.recognized_char) {
-              recognizedChars += response.data.recognized_char;
-              resultParagraph.textContent = `Recognized: ${recognizedChars}`;
-              keywordParagraph.textContent = `Keyword: ${recognizedChars}`;
-              getRecommendationButton.style.display = 'block';
-            } else {
-              console.error('Error:', response.data.error);
-              alert('No gesture recognized. Please try again.');
-            }
-          })
-          .catch(error => {
-            console.error('Error:', error);
-            alert('An error occurred while processing the gesture. Please try again.');
-          });
-      });
-    });
-
-    // Get recommendation based on the recognized keyword
-    getRecommendationButton.addEventListener('click', () => {
-      axios.post('/get_recommendation', {
-          keyword: recognizedChars
-        })
-        .then(response => {
-          recommendationParagraph.textContent = response.data.recommendation;
-        })
-        .catch(error => {
-          console.error('Error:', error);
-          alert('An error occurred while getting the recommendation. Please try again.');
+      try {
+        const response = await axios.post('/recognize_sign', {
+          frame: imageDataUrl,
+          disability: '{{ disability }}',
+          keyword: keyword
         });
+
+        if (response.data.match) {
+          resultDiv.innerHTML = `
+                        <p class="text-green-600 font-bold">Match found: ${response.data.char}</p>
+                        <h3 class="font-bold mt-2">Recommendations:</h3>
+                        <ul class="list-disc pl-5">
+                            ${response.data.recommendations.map(rec => `<li>${rec}</li>`).join('')}
+                        </ul>
+                    `;
+        } else if (response.data.char) {
+          resultDiv.innerHTML = `<p class="text-red-600">No match. Recognized character: ${response.data.char}</p>`;
+        } else {
+          resultDiv.innerHTML = '<p class="text-red-600">No hand detected. Please try again.</p>';
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        resultDiv.innerHTML = '<p class="text-red-600">An error occurred. Please try again.</p>';
+      }
     });
   </script>
 </body>
