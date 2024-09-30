@@ -1,0 +1,72 @@
+<!-- templates/camera.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Capture Gesture</title>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+
+<body>
+  <h1>Capture Your Gesture</h1>
+  <video id="video" width="640" height="480" autoplay></video>
+  <button id="capture">Capture Gesture</button>
+  <canvas id="canvas" width="640" height="480" style="display: none;"></canvas>
+  <p id="result"></p>
+  <p id="keyword"></p>
+  <button id="getRecommendation" style="display: none;">Get Recommendation</button>
+  <p id="recommendation"></p>
+
+  <script>
+    let recognizedChars = '';
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const captureButton = document.getElementById('capture');
+    const resultParagraph = document.getElementById('result');
+    const keywordParagraph = document.getElementById('keyword');
+    const getRecommendationButton = document.getElementById('getRecommendation');
+    const recommendationParagraph = document.getElementById('recommendation');
+
+    navigator.mediaDevices.getUserMedia({
+        video: true
+      })
+      .then(stream => {
+        video.srcObject = stream;
+      })
+      .catch(err => console.error(err));
+
+    captureButton.addEventListener('click', () => {
+      canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+      canvas.toBlob(blob => {
+        const formData = new FormData();
+        formData.append('image', blob, 'capture.jpg');
+        axios.post('/process_frame', formData)
+          .then(response => {
+            if (response.data.recognized_char) {
+              recognizedChars += response.data.recognized_char;
+              resultParagraph.textContent = `Recognized: ${recognizedChars}`;
+              keywordParagraph.textContent = `Keyword: ${recognizedChars}`;
+              getRecommendationButton.style.display = 'block';
+            } else {
+              console.error('Error:', response.data.error);
+            }
+          })
+          .catch(error => console.error('Error:', error));
+      });
+    });
+
+    getRecommendationButton.addEventListener('click', () => {
+      axios.post('/get_recommendation', {
+          keyword: recognizedChars
+        })
+        .then(response => {
+          recommendationParagraph.textContent = response.data.recommendation;
+        })
+        .catch(error => console.error('Error:', error));
+    });
+  </script>
+</body>
+
+</html>
