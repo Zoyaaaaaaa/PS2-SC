@@ -35,6 +35,9 @@ const Navbar = () => {
             <li>
               <a href="http://localhost:3001">AI Planner</a>
             </li>
+            <li>
+              <a href="http://127.0.0.1:5000/">Text-to-Sign</a>
+            </li>
             {/* <li>
               <Link to="/dashboard">Dashboard</Link>
             </li> */}
@@ -108,15 +111,11 @@ const Navbar = () => {
           <li>
             <Link to="/yatras">Yatras</Link>
           </li>
-          <li className="p-4 hover:bg-gray-100">
-            {/* <Link to="/dashboard" onClick={handleClick}>
-              Dashboard
-            </Link> */}
+          <li>
+            <a href="http://localhost:3001">AI-Planner</a>
           </li>
-          <li className="p-4 hover:bg-gray-100">
-            {/* <Link to="/create-journey" onClick={handleClick}>
-              Create Journey
-            </Link> */}
+          <li>
+            <a href="http://127.0.0.1:5000/">Text-to-Sign</a>
           </li>
           <li className="p-4 hover:bg-gray-100">
             <Link to="/enroll" onClick={handleClick}>
