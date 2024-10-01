@@ -245,6 +245,7 @@ const AccessibleYatrasAndAssistance = () => {
                 <button
                   type="submit"
                   className="w-full bg-teal-500 text-white px-4 py-2 rounded-md hover:bg-teal-600 transition-colors duration-300"
+                  onClick={() => alert("Booking confirmed")}
                 >
                   Confirm Booking
                 </button>
@@ -299,6 +300,7 @@ const AccessibleYatrasAndAssistance = () => {
                 <button
                   type="submit"
                   className="w-full bg-teal-500 text-white px-4 py-2 rounded-md hover:bg-teal-600 transition-colors duration-300"
+                  onClick={() => alert("Booking confirmed")}
                 >
                   Confirm Booking
                 </button>
